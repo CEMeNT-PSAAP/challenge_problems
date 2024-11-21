@@ -59,17 +59,23 @@ mcdc.source(
 # Set tally, setting, and run mcdc
 # =============================================================================
 
+time_grid = np.linspace(0.0, 200.0, 101)
+
 # Tally
 mcdc.tally.mesh_tally(
     scores=["flux"],
     x=np.linspace(0.0, 60.0, 61),
     y=np.linspace(0.0, 100.0, 101),
     z=np.linspace(0.0, 60.0, 61),
-    t=np.linspace(0.0, 200.0, 101),
+    t=time_grid,
+)
+mcdc.tally.mesh_tally(
+    scores=["density"],
+    t=time_grid,
 )
 
 # Setting
-mcdc.setting(N_particle=1e4, N_batch=50)
+mcdc.setting(N_particle=1e3, N_batch=50)
 
 # Run
 mcdc.run()

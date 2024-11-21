@@ -21,11 +21,11 @@ with h5py.File("output.h5", "r") as f:
     phi = f["tallies/mesh_tally_0/flux/mean"][:]
     phi_sd = f["tallies/mesh_tally_0/flux/sdev"][:]
 
+    phi_total = f["tallies/mesh_tally_1/density/mean"][:]
+    phi_total_sd = f["tallies/mesh_tally_1/density/sdev"][:]
+
 phi = np.sum(phi, axis=3)
 phi_sd = np.linalg.norm(phi_sd, axis=3)
-
-phi_total = np.sum(phi, axis=(1, 2))
-phi_total_sd = np.linalg.norm(phi_sd, axis=(1, 2))
 
 fig, ax = plt.subplots(1, 2, figsize=(8, 4), gridspec_kw={"width_ratios": [1.0, 2]})
 
