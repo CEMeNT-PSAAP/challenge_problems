@@ -30,7 +30,7 @@ A semi-analytical reference solution for neutron flux energy-time distribution, 
 
 ## Problem 4: C5G7-TD4-4
 
-A 4x4 multigroup light water reactor assembly turned off-critical by maneuvers of control rod assemblies.
+A 3D 4x4 multigroup light water reactor assembly turned off-critical by maneuvers of control rod assemblies.
 
 This is the fourth test problem of Exercise 4 of the C5G7-TD benchmark suite [^4].
 The problem consists of two parts: (1) running static k-eigenvalue calculation to sample the steady-state initial condition and (2) running the transient problem using the obtained initial source neutrons.
@@ -45,8 +45,8 @@ The transient is driven by time-dependent control rod positions and neutron sour
 - Phase 2: Control rods withdrawal demonstrating the S-wave power maneuver,
 - Phase 3: Power excursion from prompt supercriticality,
 - Phase 4: Reactor shutdown emphasizing the delayed neutron effects.
-Stuck control rods are considered to promote spatial asymmetry in the fux distribution.
-Quantities of interest include total neutron density in time and axially-segmented pin power and fluxes.
+Stuck control rods are considered to promote spatial asymmetry in the flux distribution.
+Quantities of interest include total neutron density in time and axially segmented pin power and fluxes.
 
 ## Problem 5: C5G7 Four-Phase Transient
 
