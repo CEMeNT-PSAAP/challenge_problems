@@ -30,9 +30,10 @@ A semi-analytical reference solution for neutron flux energy-time distribution, 
 
 ## Problem 4: C5G7-TD4-4
 
-A 4x4 multigroup light water reactor assembly turned off-critical by control rod bank maneuver.
+A 4x4 multigroup light water reactor assembly turned off-critical by maneuvers of control rod assemblies.
 
 This is the fourth test problem of Exercise 4 of the C5G7-TD benchmark suite [^4].
+The problem consists of two parts: (1) running static k-eigenvalue calculation to sample the steady-state initial condition and (2) running the transient problem using the obtained initial source neutrons.
 
 [^4]: Jason Hou, Kostadin N. Ivanov, Victor F. Boyarinov, and Peter A. Formichenko, "OECD/NEA benchmark for time-dependent neutron transport calculations without spatial homogenization," Nuclear Engineering and Design, 317, 177-189 (2017). [[link]](https://www.sciencedirect.com/science/article/abs/pii/S0029549317300572?via%3Dihub)
 
