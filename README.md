@@ -33,9 +33,16 @@ A semi-analytical reference solution for neutron flux energy-time distribution, 
 A 3D 4x4 multigroup light water reactor assembly turned off-critical by maneuvers of control rod assemblies.
 
 This is the fourth test problem of Exercise 4 of the C5G7-TD benchmark suite [^4].
-The problem consists of two parts: (1) running static k-eigenvalue calculation to sample the steady-state initial condition and (2) running the transient problem using the obtained initial source neutrons.
+Solving the problem consists of three parts: 
+1. Running static k-eigenvalue calculation to obtain fission neutron particles and parameters needed for initial condition generation, and
+2. Running the initial condition generation based on the parameters and fission neutrons obtained in the previous part.
+3. Running the time-dependent problem using the sampled initial source neutrons.
+
+The first two parts are based on the methods described in [^5]
 
 [^4]: Jason Hou, Kostadin N. Ivanov, Victor F. Boyarinov, and Peter A. Formichenko, "OECD/NEA benchmark for time-dependent neutron transport calculations without spatial homogenization," Nuclear Engineering and Design, 317, 177-189 (2017). [[link]](https://www.sciencedirect.com/science/article/abs/pii/S0029549317300572?via%3Dihub)
+
+[^5]: Ilham Variansyah and Ryan G. McClarren, "An Effective Initial Particle Sampling Technique for Monte Carlo Reactor Transient Simulations," In the Proceeding of the M&C 2023, American Nuclear Society, Niagara Falls, Canada (2023). [[link]](https://arxiv.org/abs/2305.07646)
 
 ## The Four-Phase Transient
 
@@ -58,22 +65,22 @@ A _continuous-energy_ version of the C5G7-TD model [^4] going through the Four-P
 
 ## Problem 7: SMR-MG Four-Phase Transient
 
-A _multigroup_ NuScale-inspired small modular reactor model [^5] going through the 4-phase transients.
+A _multigroup_ NuScale-inspired small modular reactor model [^6] going through the 4-phase transients.
 
-[^5]: "NuScale Codes and Methods Framework Description Report," NRC, NP-TR-0812-1682-NP (2013). [[link]](https://www.nrc.gov/docs/ML1301/ML13018A154.pdf)
+[^6]: "NuScale Codes and Methods Framework Description Report," NRC, NP-TR-0812-1682-NP (2013). [[link]](https://www.nrc.gov/docs/ML1301/ML13018A154.pdf)
 
 ## Problem 8: SMR Four-Phase Transient
 
-A NuScale-inspired small modular reactor model [^5] going through the 4-phase transients.
+A NuScale-inspired small modular reactor model [^6] going through the 4-phase transients.
 
 ## Problem 9: SMR-Depleted Four-Phase Transient
 
-A _depleted_ NuScale-inspired small modular reactor model [^5] going through the 4-phase transients.
+A _depleted_ NuScale-inspired small modular reactor model [^6] going through the 4-phase transients.
 
 ## Problem 10: Dragon
 
 A fast neutron burst induced by strong reactivity pulses from a drop-through of a highly enriched uranium slug.
 
-The problem attempts to simulate the Dragon machine experiment by Otto Frisch [^6].
+The problem attempts to simulate the Dragon machine experiment by Otto Frisch [^7].
 
-[^6]: Robert Kimpland, Travis Grove, Peter Jaegers, Richard Malenfant, and William Myers, "Critical Assemblies: Dragon Burst Assembly and Solution Assemblies," Nuclear Technology, 207, S81-S99 (2021). [[link]](https://www.tandfonline.com/doi/pdf/10.1080/00295450.2021.1927626)
+[^7]: Robert Kimpland, Travis Grove, Peter Jaegers, Richard Malenfant, and William Myers, "Critical Assemblies: Dragon Burst Assembly and Solution Assemblies," Nuclear Technology, 207, S81-S99 (2021). [[link]](https://www.tandfonline.com/doi/pdf/10.1080/00295450.2021.1927626)
