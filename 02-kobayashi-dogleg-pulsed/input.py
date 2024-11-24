@@ -59,9 +59,8 @@ mcdc.source(
 # Set tally, setting, and run mcdc
 # =============================================================================
 
-time_grid = np.linspace(0.0, 200.0, 101)
-
 # Tally
+time_grid = np.linspace(0.0, 200.0, 101)
 mcdc.tally.mesh_tally(
     scores=["flux"],
     x=np.linspace(0.0, 60.0, 61),

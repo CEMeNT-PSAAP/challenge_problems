@@ -7,7 +7,7 @@ import mcdc
 # The infinite homogenous medium is modeled with reflecting slab
 
 # Materials
-with np.load("SHEM-361.npz") as data:
+with np.load("../data/MGXS-SHEM361.npz") as data:
     SigmaC = data["SigmaC"] * 1.27  # /cm
     SigmaS = data["SigmaS"]
     SigmaF = data["SigmaF"]
@@ -51,9 +51,8 @@ source = mcdc.source(energy=energy)
 # Set tally, setting, and run mcdc
 # =============================================================================
 
-time_grid = np.insert(np.logspace(-8, 1, 100), 0, 0.0)
-
 # Tally
+time_grid = np.insert(np.logspace(-8, 1, 100), 0, 0.0)
 mcdc.tally.mesh_tally(
     scores=["flux"], t=time_grid, g="all"
 )
