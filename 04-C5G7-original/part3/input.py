@@ -62,14 +62,14 @@ z4_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
 zf = mcdc.surface("plane-z", z=0.5 * core_height)
 
 # Set moving control rods' durations
-cr3_durations = np.array([2.0, 2.0, 2.0])
-cr4_durations = np.array([4.0, 2.0, 2.0])
+cr3_durations = np.array([4.0, 2.0, 2.0])
+cr4_durations = np.array([2.0, 2.0, 2.0])
 
 # Set moving control rods' velocities
 cr3_velocities = np.zeros(cr3_durations.shape + (3,))
 cr4_velocities = np.zeros(cr4_durations.shape + (3,))
-cr3_velocities[:, 2] = np.array([-1.0/6.0, 0.0, 1.0/6.0]) * core_height
-cr4_velocities[:, 2] = np.array([0.0, -1.0/6.0, 1.0/6.0]) * core_height
+cr3_velocities[:, 2] = np.array([0.0, -1.0/6.0, 1.0/6.0]) * core_height
+cr4_velocities[:, 2] = np.array([-1.0/6.0, 0.0, 1.0/6.0]) * core_height
 
 # Move the control tips
 z3_top.move(cr3_velocities, cr3_durations)
