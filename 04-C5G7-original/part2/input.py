@@ -285,7 +285,7 @@ source = mcdc.source(
 # =============================================================================
 
 # Set and get the parameters
-target = 1e4
+target = 1e2
 base_file = '../part1/output.h5'
 with h5py.File(base_file, 'r') as f:
     neutron_density = f["global_tally/neutron/mean"][()]
