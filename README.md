@@ -14,7 +14,7 @@ A mono-energetic, 3D shielding system featuring a dog-leg vacuum channel surroun
 
 The problem is based on an NEA steady-state fixed-source benchmark problem suite [^2].
 Time dependence is introduced by turning the fixed source source into a histogram pulse.
-The quantity of interest is the 4D flux distribution, $\phi(x,y,z,t)$, in a fine mesh of 60x100x60x100.
+Quantities of interest are the 4D flux distribution, $\phi(x,y,z,t)$, in a fine mesh of 60x100x60x100 and the total neutron density in time.
 
 [^2]: Keisuke Kobayashi, Naoki Sugimura, and Yasunobu Nagaya, "3D Radiation Transport Benchmark Problems and Results for Simple Geometries with Void Region." Progress in Nuclear Energy, 39:2, 119-144 (2001). [[link]](https://www.sciencedirect.com/science/article/abs/pii/S0149197001000075)
 
@@ -28,7 +28,15 @@ A semi-analytical reference solution for neutron flux energy-time distribution, 
 
 [^3]: Paul K. Romano, Nicholas E. Horelik, Bryan R. Herman, Adam G. Nelson, Benoit Forget, and Kord Smith, “OpenMC: A State-of-the-Art Monte Carlo Code for Research and Development,” Annals of Nuclear Energy, 82, 90–97 (2015). [[link]](https://www.sciencedirect.com/science/article/abs/pii/S030645491400379X) [[repository]](https://github.com/openmc-dev/openmc)
 
-## Problem 4: C5G7-TD4-4
+## Problem 4: Infinite SMR Fuel Pin Lattice
+
+A pulsed infinite pin cell lattice.
+
+The _continuous-energy_ system is made subcritical by increasing the distance between fuel pins.
+A logarithmic time-mesh tally is used to observe both the prompt and delayed neutron flux responses.
+Quantities of interest are the flux energy spectrum evolution, $\phi(E,t)$, and the total neutron density in time.
+
+## Problem 5: C5G7-TD4-4
 
 A 3D 4x4 multigroup light water reactor assembly turned off-critical by maneuvers of control rod assemblies.
 
@@ -55,29 +63,29 @@ The transient is driven by time-dependent control rod positions and neutron sour
 Stuck control rods are considered to promote spatial asymmetry in the flux distribution.
 Quantities of interest include total neutron density in time and axially segmented pin power and fluxes.
 
-## Problem 5: C5G7 Four-Phase Transient
+## Problem 6: C5G7 Four-Phase Transient
 
 The C5G7-TD model [^4] going through the Four-Phase Transient.
 
-## Problem 6: C5CE Four-Phase Transient
+## Problem 7: C5CE Four-Phase Transient
 
 A _continuous-energy_ version of the C5G7-TD model [^4] going through the Four-Phase Transient.
 
-## Problem 7: SMR-MG Four-Phase Transient
+## Problem 8: SMR-MG Four-Phase Transient
 
 A _multigroup_ NuScale-inspired small modular reactor model [^6] going through the 4-phase transients.
 
 [^6]: "NuScale Codes and Methods Framework Description Report," NRC, NP-TR-0812-1682-NP (2013). [[link]](https://www.nrc.gov/docs/ML1301/ML13018A154.pdf)
 
-## Problem 8: SMR Four-Phase Transient
+## Problem 9: SMR Four-Phase Transient
 
 A NuScale-inspired small modular reactor model [^6] going through the 4-phase transients.
 
-## Problem 9: SMR-Depleted Four-Phase Transient
+## Problem 10: SMR-Depleted Four-Phase Transient
 
 A _depleted_ NuScale-inspired small modular reactor model [^6] going through the 4-phase transients.
 
-## Problem 10: Dragon
+## Problem 11: Dragon
 
 A fast neutron burst induced by strong reactivity pulses from a drop-through of a highly enriched uranium slug.
 
