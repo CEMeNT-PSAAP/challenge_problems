@@ -9,11 +9,11 @@ import mcdc
 # Materials
 fuel = mcdc.material(
     [
-        ["U235", 0.0005581658948833916],
-        ["U238", 0.022404594715383263],
-        ["O16", 0.045831301393656466],
-        ["O17", 1.7411492132576054e-05],
-        ["O18", 9.18996012190109e-05],
+        ["O16", 0.04585265389377734],
+        ["O17", 1.7419604031574338e-05],
+        ["O18", 9.19424166352541e-05],
+        ["U235", 0.0007217486041189947],
+        ["U238", 0.02224950230720295],
     ]
 )
 gas = mcdc.material(
@@ -35,11 +35,10 @@ cladding = mcdc.material(
         ["O18", 1.15880388345964e-07],
     ]
 )
-absorber = 2.3
 water = mcdc.material(
     nuclides=[
-        ["B10", 1.0323440206972448e-05 * absorber],
-        ["B11", 4.1762534601163005e-05 * absorber],
+        ["B10", 1.0323440206972448e-05],
+        ["B11", 4.1762534601163005e-05],
         ["H1", 0.050347844752850625],
         ["H2", 7.842394716362082e-06],
         ["O16", 0.025117935412784034],
@@ -53,7 +52,7 @@ cy1 = mcdc.surface("cylinder-z", center=[0.0, 0.0], radius=0.405765)
 cy2 = mcdc.surface("cylinder-z", center=[0.0, 0.0], radius=0.41402)
 cy3 = mcdc.surface("cylinder-z", center=[0.0, 0.0], radius=0.47498)
 #
-pitch = 1.25984
+pitch = 1.92
 x1 = mcdc.surface("plane-x", x=-pitch / 2, bc="reflective")
 x2 = mcdc.surface("plane-x", x=pitch / 2, bc="reflective")
 y1 = mcdc.surface("plane-y", y=-pitch / 2, bc="reflective")
@@ -71,8 +70,7 @@ mcdc.cell(+cy3 & +x1 & -x2 & +y1 & -y2, water)
 # 14.1 MeV, isotropic, at center
 
 mcdc.source(
-    x=[-pitch / 2, pitch / 2],
-    y=[-pitch / 2, pitch / 2],
+    point=[0.0, 0.0, 0.0],
     energy=np.array([[1e6 - 1, 1e6 + 1], [1.0, 1.0]]),
     isotropic=True,
 )
