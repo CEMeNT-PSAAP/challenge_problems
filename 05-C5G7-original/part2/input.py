@@ -1,10 +1,6 @@
 import numpy as np
 import h5py, mcdc
 
-# Get IC generator parameters
-with h5py.File("../part2/output.h5", "r") as f:
-    keff = f["k_mean"][()]
-
 # =============================================================================
 # Materials
 # =============================================================================
@@ -18,8 +14,8 @@ def set_mat(mat):
         capture=mat["capture"][:],
         scatter=mat["scatter"][:],
         fission=mat["fission"][:],
-        nu_p=mat["nu_p"][:] / keff,
-        nu_d=mat["nu_d"][:] / keff,
+        nu_p=mat["nu_p"][:],
+        nu_d=mat["nu_d"][:],
         chi_p=mat["chi_p"][:],
         chi_d=mat["chi_d"][:],
         speed=mat["speed"],
@@ -60,22 +56,6 @@ z4_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
 # Fuel top
 #   (Bottom is bounded by the universe cell)
 zf = mcdc.surface("plane-z", z=0.5 * core_height)
-
-# Set moving control rods' durations
-cr3_durations = np.array([2.0, 2.0, 2.0])
-cr4_durations = np.array([4.0, 2.0, 2.0])
-
-# Set moving control rods' velocities
-cr3_velocities = np.zeros(cr3_durations.shape + (3,))
-cr4_velocities = np.zeros(cr4_durations.shape + (3,))
-cr3_velocities[:, 2] = np.array([-1.0/6.0, 0.0, 1.0/6.0]) * core_height
-cr4_velocities[:, 2] = np.array([0.0, -1.0/6.0, 1.0/6.0]) * core_height
-
-# Move the control tips
-z3_top.move(cr3_velocities, cr3_durations)
-z3_bottom.move(cr3_velocities, cr3_durations)
-z4_top.move(cr4_velocities, cr4_durations)
-z4_bottom.move(cr4_velocities, cr4_durations)
 
 # Fission chamber pin
 fc = mcdc.cell(-cy, mat_fc)
@@ -291,25 +271,42 @@ mcdc.universe(
 # =============================================================================
 # Set source
 # =============================================================================
-# In the center of Assembly one, at highest energy, for the first 15 seconds
+# In the center of Assembly one, at highest energy
 
 energy = np.zeros(7)
 energy[0] = 1.0
 
 source = mcdc.source(
-    point=[pitch * 17 / 2, -pitch * 17 / 2, 0.0], time=[0.0, 15.0], energy=energy
+    point=[pitch * 17 / 2, -pitch * 17 / 2, 0.0], energy=energy
 )
 
 # =============================================================================
 # Set tally, setting, and run mcdc
 # =============================================================================
 
-# Tally
-t_grid = np.linspace(0.0, 20.0, 201)
-mcdc.tally.mesh_tally(scores=["fission"], t=t_grid)
+# Set and get the parameters
+target = 1e2
+base_file = '../part1/output.h5'
+with h5py.File(base_file, 'r') as f:
+    neutron_density = f["global_tally/neutron/mean"][()]
+    max_neutron_density = f["global_tally/neutron/max"][()]
+    precursor_density = f["global_tally/precursor/mean"][()]
+    max_precursor_density = f["global_tally/precursor/max"][()]
+    keff = f['k_mean'][()]
 
 # Setting
-mcdc.setting(IC_file="../part2/output.h5", active_bank_buff=10000)
+mcdc.setting(source_file=base_file)
+mcdc.eigenmode(gyration_radius="all")
+
+# Set the initial condition generator
+mcdc.IC_generator(
+    N_neutron=target,
+    N_precursor=target,
+    neutron_density=neutron_density,
+    max_neutron_density=max_neutron_density,
+    precursor_density=precursor_density,
+    max_precursor_density=max_precursor_density,
+)
 
 # Run
 mcdc.run()

@@ -6,7 +6,7 @@ import h5py, mcdc
 # =============================================================================
 
 # Load material data
-lib = h5py.File("../../data/MGXS-C5G7.h5", "r")
+lib = h5py.File("../data/MGXS-C5G7.h5", "r")
 
 # Setter
 def set_mat(mat):
@@ -42,20 +42,71 @@ radius = 0.54
 core_height = 128.52
 reflector_thickness = 21.42
 
+# Control rod banks fractions
+#   All out: 0.0
+#   All in : 1.0
+cr1 = np.array([1.0, 1.0, 1.0, 0.889, 1.0])
+cr1_t = np.array([0.0, 5.0, 10.0, 15.0, 15.0 + 1.0 - cr1[-2]])
+
+cr2 = np.array([1.0, 1.0, 0.0, 0.0, 0.8])
+cr2_t = np.array([0.0, 5.0, 10.0, 15.0, 15.8])
+
+cr3 = np.array([0.75, 0.75, 1.0])
+cr3_t = np.array([0.0, 15.0, 15.25])
+
+cr4 = np.array([1.0, 1.0, 0.5, 0.5, 1.0])
+cr4_t = np.array([0.0, 5.0, 7.5, 15.0, 15.5])
+
+# Tips of the control rod banks
+cr1_bottom = core_height * (0.5 - cr1)
+cr2_bottom = core_height * (0.5 - cr2)
+cr3_bottom = core_height * (0.5 - cr3)
+cr4_bottom = core_height * (0.5 - cr4)
+cr1_top = cr1_bottom + core_height
+cr2_top = cr2_bottom + core_height
+cr3_top = cr3_bottom + core_height
+cr4_top = cr4_bottom + core_height
+
+# Durations of the moving tips
+cr1_durations = cr1_t[1:] - cr1_t[:-1]
+cr2_durations = cr2_t[1:] - cr2_t[:-1]
+cr3_durations = cr3_t[1:] - cr3_t[:-1]
+cr4_durations = cr4_t[1:] - cr4_t[:-1]
+
+# Velocities of the moving tips
+cr1_velocities = np.zeros((len(cr1) - 1, 3))
+cr2_velocities = np.zeros((len(cr2) - 1, 3))
+cr3_velocities = np.zeros((len(cr3) - 1, 3))
+cr4_velocities = np.zeros((len(cr4) - 1, 3))
+cr1_velocities[:, 2] = (cr1[1:] - cr1[:-1]) / cr1_durations * core_height
+cr2_velocities[:, 2] = (cr2[1:] - cr2[:-1]) / cr2_durations * core_height
+cr3_velocities[:, 2] = (cr3[1:] - cr3[:-1]) / cr3_durations * core_height
+cr4_velocities[:, 2] = (cr4[1:] - cr4[:-1]) / cr4_durations * core_height
+
 # Surfaces
 cy = mcdc.surface("cylinder-z", center=[0.0, 0.0], radius=radius)
 # Control rod top and bottom tips
-z1_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z1_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
-z2_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z2_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
-z3_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z3_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
-z4_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z4_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
+z1_top = mcdc.surface("plane-z", z=cr1_top[0])
+z1_bottom = mcdc.surface("plane-z", z=cr1_bottom[0])
+z2_top = mcdc.surface("plane-z", z=cr2_top[0])
+z2_bottom = mcdc.surface("plane-z", z=cr2_bottom[0])
+z3_top = mcdc.surface("plane-z", z=cr3_top[0])
+z3_bottom = mcdc.surface("plane-z", z=cr3_bottom[0])
+z4_top = mcdc.surface("plane-z", z=cr4_top[0])
+z4_bottom = mcdc.surface("plane-z", z=cr4_bottom[0])
 # Fuel top
 #   (Bottom is bounded by the universe cell)
 zf = mcdc.surface("plane-z", z=0.5 * core_height)
+
+# Move the control tips
+z1_top.move(cr1_velocities, cr1_durations)
+z1_bottom.move(cr1_velocities, cr1_durations)
+z2_top.move(cr2_velocities, cr2_durations)
+z2_bottom.move(cr2_velocities, cr2_durations)
+z3_top.move(cr3_velocities, cr3_durations)
+z3_bottom.move(cr3_velocities, cr3_durations)
+z4_top.move(cr4_velocities, cr4_durations)
+z4_bottom.move(cr4_velocities, cr4_durations)
 
 # Fission chamber pin
 fc = mcdc.cell(-cy, mat_fc)
@@ -271,42 +322,25 @@ mcdc.universe(
 # =============================================================================
 # Set source
 # =============================================================================
-# In the center of Assembly one, at highest energy
+# In the center of Assembly one, at highest energy, for the first 15 seconds
 
 energy = np.zeros(7)
 energy[0] = 1.0
 
 source = mcdc.source(
-    point=[pitch * 17 / 2, -pitch * 17 / 2, 0.0], energy=energy
+    point=[pitch * 17 / 2, -pitch * 17 / 2, 0.0], time=[0.0, 15.0], energy=energy
 )
 
 # =============================================================================
 # Set tally, setting, and run mcdc
 # =============================================================================
 
-# Set and get the parameters
-target = 1e4
-base_file = '../part1/output.h5'
-with h5py.File(base_file, 'r') as f:
-    neutron_density = f["global_tally/neutron/mean"][()]
-    max_neutron_density = f["global_tally/neutron/max"][()]
-    precursor_density = f["global_tally/precursor/mean"][()]
-    max_precursor_density = f["global_tally/precursor/max"][()]
-    keff = f['k_mean'][()]
+# Tally
+t_grid = np.linspace(0.0, 20.0, 201)
+mcdc.tally.mesh_tally(scores=["fission"], t=t_grid)
 
 # Setting
-mcdc.setting(source_file=base_file)
-mcdc.eigenmode(gyration_radius="all")
-
-# Set the initial condition generator
-mcdc.IC_generator(
-    N_neutron=target,
-    N_precursor=target,
-    neutron_density=neutron_density,
-    max_neutron_density=max_neutron_density,
-    precursor_density=precursor_density,
-    max_precursor_density=max_precursor_density,
-)
+mcdc.setting(N_particle=1e5, active_bank_buff=1000)
 
 # Run
 mcdc.run()
