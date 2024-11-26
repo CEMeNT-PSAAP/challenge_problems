@@ -3,18 +3,12 @@ import matplotlib.pyplot as plt
 import h5py
 import matplotlib.animation as animation
 
-# Reference solution
-data = np.load("reference.npz")
-phi_ref = data["phi"].T
-n_ref = data["n"]
-
 # Load results
 with np.load("../data/MGXS-SHEM361.npz") as data:
     E = data["E"]
-    G = data["G"]
-    speed = data["v"]
     E_mid = 0.5 * (E[1:] + E[:-1])
     dE = E[1:] - E[:-1]
+
 with h5py.File('output.h5', "r") as f:
     t = f["tallies/mesh_tally_0/grid/t"][:]
     dt = t[1:] - t[:-1]
@@ -27,18 +21,8 @@ with h5py.File('output.h5', "r") as f:
     n = f["tallies/mesh_tally_1/density/mean"][:]
     n_sd = f["tallies/mesh_tally_1/density/sdev"][:]
 
-# Neutron density
-'''
-n = np.zeros(K)
-n_sd = np.zeros(K)
-for k in range(K):
-    n[k] = np.sum(phi[:, k] / speed) / dt[k]
-    n_sd[k] = np.linalg.norm(phi_sd[:, k] / speed) / dt[k]
-'''
-
 # Normalize
 for k in range(K):
-    phi_ref[:, k] *= E_mid / dE
     phi[:, k] *= E_mid / dE / dt[k]
     phi_sd[:, k] *= E_mid / dE / dt[k]
 n /= dt
@@ -52,7 +36,6 @@ ax1.plot(t_mid, n, "-b", label="MC")
 no = np.zeros_like(n)
 (line,) = ax1.plot(t[1:], no, "ko", fillstyle="none")
 ax1.fill_between(t[1:], n - n_sd, n + n_sd, alpha=0.2, color="b")
-ax1.plot(t_mid, n_ref, "--r", label="Ref.")
 ax1.set_xlabel(r"$t$, s")
 ax1.set_ylabel("Density")
 ax1.set_yscale("log")
@@ -67,7 +50,6 @@ ax2.set_ylabel(r"$E\phi(E)$")
 ax2.set_title(r"$\phi(E,t)$")
 ax2.set_xscale("log")
 (line1,) = ax2.plot([], [], "-b", label="MC")
-(line2,) = ax2.plot([], [], "--r", label="Ref.")
 fb = ax2.fill_between([], [], [], [], alpha=0.2, color="b")
 ax2.legend()
 
@@ -86,10 +68,9 @@ def animate(k):
         alpha=0.2,
         color="b",
     )
-    line2.set_data(E_mid, phi_ref[:, k])
-    ax2.set_ylim([(phi_ref[:, k]).min(), (phi_ref[:, k]).max()])
+    ax2.set_ylim([(phi[:, k]).min(), (phi[:, k]).max()])
     ax2.legend()
-    return line1, line2
+    return line1
 
 
 simulation = animation.FuncAnimation(fig, animate, frames=K)
