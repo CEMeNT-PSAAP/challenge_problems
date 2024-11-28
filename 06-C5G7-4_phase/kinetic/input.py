@@ -6,7 +6,7 @@ import h5py, mcdc
 # =============================================================================
 
 # Load material data
-lib = h5py.File("../data/MGXS-C5G7.h5", "r")
+lib = h5py.File("../../data/MGXS-C5G7.h5", "r")
 
 # Setter
 def set_mat(mat):
