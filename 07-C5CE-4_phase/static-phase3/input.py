@@ -98,10 +98,10 @@ reflector_thickness = 21.42
 # Control rod banks fractions
 #   All out: 0.0
 #   All in : 1.0
-cr1 = 1.0
-cr2 = 1.0
+cr1 = 0.82
+cr2 = 0.0
 cr3 = 0.0
-cr4 = 1.0
+cr4 = 0.65
 
 # Tips of the control rod banks
 cr1_bottom = core_height * (0.5 - cr1)

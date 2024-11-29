@@ -99,8 +99,8 @@ reflector_thickness = 21.42
 #   All out: 0.0
 #   All in : 1.0
 cr1 = 1.0
-cr2 = 1.0
-cr3 = 0.0
+cr2 = 0.3
+cr3 = 1.0
 cr4 = 1.0
 
 # Tips of the control rod banks
