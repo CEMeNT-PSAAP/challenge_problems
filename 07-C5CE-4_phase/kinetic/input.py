@@ -98,11 +98,11 @@ reflector_thickness = 21.42
 # Control rod banks fractions
 #   All out: 0.0
 #   All in : 1.0
-cr1 = np.array([1.0, 1.0, 0.82, 1.0])
+cr1 = np.array([1.0, 1.0, 0.854, 1.0])
 cr1_t = np.array([0.0, 10.0, 15.0, 15.0 + 1.0 - cr1[-2]])
 
-cr2 = np.array([1.0, 1.0, 0.0, 0.0, 0.3])
-cr2_t = np.array([0.0, 5.0, 10.0, 15.0, 15.3])
+cr2 = np.array([1.0, 1.0, 0.0, 0.0, 0.90])
+cr2_t = np.array([0.0, 5.0, 10.0, 15.0, 15.9])
 
 cr3 = np.array([0.0, 0.0, 1.0])
 cr3_t = np.array([0.0, 15.0, 16.0])
@@ -379,8 +379,7 @@ mcdc.universe(
 
 mcdc.source(
     point=[pitch * 17 / 2, -pitch * 17 / 2, 0.0],
-    #time=[0.0, 15.0],
-    time=[0.0, 10.0],
+    time=[0.0, 15.0],
     energy=np.array([[1e6 - 1, 1e6 + 1], [1.0, 1.0]]),
     isotropic=True,
 )
@@ -390,8 +389,7 @@ mcdc.source(
 # =============================================================================
 
 # Tally
-#t_grid = np.linspace(0.0, 20.0, 201)
-t_grid = np.linspace(0.0, 10.0, 101)
+t_grid = np.linspace(0.0, 20.0, 201)
 mcdc.tally.mesh_tally(scores=["fission"], t=t_grid)
 
 # Setting
