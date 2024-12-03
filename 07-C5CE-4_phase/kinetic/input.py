@@ -403,7 +403,7 @@ mcdc.tally.mesh_tally(
     x=np.linspace(0.0, pitch * 17 * 3, 17 * 3 + 1),
     y=np.linspace(-pitch * 17 * 3, 0.0, 17 * 3 + 1),
     z=np.linspace(-(core_height / 2 + reflector_thickness), (core_height / 2 + reflector_thickness), int(math.ceil((core_height + 2.0 * reflector_thickness) / pitch)) + 1),
-    g=np.array([-0.5, 4.5, 6.5]),
+    E=np.array([0.0, 0.625, 2e7]),
     t=t_grid
 )
 
