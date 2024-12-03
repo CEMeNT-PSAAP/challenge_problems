@@ -1,5 +1,5 @@
 import numpy as np
-import h5py, mcdc
+import h5py, mcdc, math
 
 # Get IC generator parameters
 with h5py.File("../part2/output.h5", "r") as f:
@@ -293,8 +293,23 @@ mcdc.universe(
 # =============================================================================
 
 # Tally
-t_grid = np.linspace(0.0, 20.0, 201)
+t_grid = np.linspace(0.0, 8.0, 81)
 mcdc.tally.mesh_tally(scores=["fission"], t=t_grid)
+mcdc.tally.mesh_tally(
+    scores=["fission"],
+    x=np.linspace(0.0, pitch * 17 * 2, 17 * 2 + 1),
+    y=np.linspace(-pitch * 17 * 2, 0.0, 17 * 2 + 1),
+    z=np.linspace(-(core_height / 2), (core_height / 2), int(math.ceil(core_height / pitch)) + 1),
+    t=t_grid
+)
+mcdc.tally.mesh_tally(
+    scores=["flux"],
+    x=np.linspace(0.0, pitch * 17 * 3, 17 * 3 + 1),
+    y=np.linspace(-pitch * 17 * 3, 0.0, 17 * 3 + 1),
+    z=np.linspace(-(core_height / 2 + reflector_thickness), (core_height / 2 + reflector_thickness), int(math.ceil((core_height + 2.0 * reflector_thickness) / pitch)) + 1),
+    g=np.array([-0.5, 4.5, 6.5]),
+    t=t_grid
+)
 
 # Setting
 mcdc.setting(IC_file="../part2/output.h5", active_bank_buff=10000)

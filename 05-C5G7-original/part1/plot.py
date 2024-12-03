@@ -11,23 +11,25 @@ from matplotlib import colors
 
 # Results
 with h5py.File("output.h5", "r") as f:
-    phi = f["tallies/mesh_tally_0/flux/mean"][:]
-    phi_sd = f["tallies/mesh_tally_0/flux/sdev"][:]
-    fiss = f["tallies/mesh_tally_1/fission/mean"][:]
-    fiss_sd = f["tallies/mesh_tally_1/fission/sdev"][:]
-
     k = f["k_cycle"][:]
     k_avg = f["k_mean"][()]
     k_sd = f["k_sdev"][()]
     rg = f["gyration_radius"][:]
 
-    x = f["tallies/mesh_tally_0/grid/x"][:]
-    y = f["tallies/mesh_tally_0/grid/y"][:]
-    z = f["tallies/mesh_tally_0/grid/z"][:]
+    fiss = f["tallies/mesh_tally_0/fission/mean"][:]
+    fiss_sd = f["tallies/mesh_tally_0/fission/sdev"][:]
 
-    xf = f["tallies/mesh_tally_1/grid/x"][:]
-    yf = f["tallies/mesh_tally_1/grid/y"][:]
-    zf = f["tallies/mesh_tally_1/grid/z"][:]
+    xf = f["tallies/mesh_tally_0/grid/x"][:]
+    yf = f["tallies/mesh_tally_0/grid/y"][:]
+    zf = f["tallies/mesh_tally_0/grid/z"][:]
+
+    phi = f["tallies/mesh_tally_1/flux/mean"][:]
+    phi_sd = f["tallies/mesh_tally_1/flux/sdev"][:]
+
+    x = f["tallies/mesh_tally_1/grid/x"][:]
+    y = f["tallies/mesh_tally_1/grid/y"][:]
+    z = f["tallies/mesh_tally_1/grid/z"][:]
+
 
 dx = x[1] - x[0]
 dz = z[1] - z[0]
