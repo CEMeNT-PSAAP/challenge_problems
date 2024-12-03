@@ -1,5 +1,5 @@
 import numpy as np
-import h5py, mcdc
+import h5py, mcdc, math
 
 # =============================================================================
 # Materials
@@ -284,8 +284,24 @@ source = mcdc.source(
 # Set tally, setting, and run mcdc
 # =============================================================================
 
+# Tally
+mcdc.tally.mesh_tally(
+    scores=["flux"],
+    x=np.linspace(0.0, pitch * 17 * 3, 17 * 3 + 1),
+    y=np.linspace(-pitch * 17 * 3, 0.0, 17 * 3 + 1),
+    z=np.linspace(-(core_height / 2 + reflector_thickness), (core_height / 2 + reflector_thickness), int(math.ceil((core_height + 2.0 * reflector_thickness) / pitch)) + 1),
+    g=np.array([-0.5, 4.5, 6.5])
+)
+mcdc.tally.mesh_tally(
+    scores=["fission"],
+    x=np.linspace(0.0, pitch * 17 * 2, 17 * 2 + 1),
+    y=np.linspace(-pitch * 17 * 2, 0.0, 17 * 2 + 1),
+    z=np.linspace(-(core_height / 2), (core_height / 2), int(math.ceil(core_height / pitch)) + 1),
+)
+
 # Setting
-mcdc.setting(N_particle=1e5)
+#mcdc.setting(N_particle=1e5)
+mcdc.setting(N_particle=1e3)
 mcdc.eigenmode(N_inactive=50, N_active=150, gyration_radius="all", save_particle=True)
 mcdc.population_control()
 

@@ -393,7 +393,7 @@ config['time'] = 1.0
 config['frac_r'] = 1.0
 config['frac_rx'] = 1.0
 config['frac_s'] = 1.0
-config['frac_sx2'] = 1.0
+config['frac_sx2'] = 0.25
 config['frac_sx3'] = 1.0
 cases = ['r', 'rx', 's', 'sx2', 'sx3']
 
@@ -1120,6 +1120,7 @@ u0 = mcdc.universe([c1105, c1106, c1107, c1108], root=True)
 # In the center, 1 MeV
 
 mcdc.source(
+    point=[0.0, 0.0, 100.0],
     energy=np.array([[1e6 - 1, 1e6 + 1], [1.0, 1.0]]),
     isotropic=True,
 )
@@ -1129,7 +1130,7 @@ mcdc.source(
 # =============================================================================
 
 # Setting
-mcdc.setting(N_particle=1e2)
+mcdc.setting(N_particle=1e5)
 mcdc.eigenmode(N_inactive=50, N_active=150, gyration_radius="all")
 mcdc.population_control()
 

@@ -173,9 +173,9 @@ config['length'] = config['top'] - config['bottom']
 config['time'] = 0.0
 config['frac_r'] = 1.0
 config['frac_rx'] = 1.0
-config['frac_s'] = 1.0
+config['frac_s'] = 0.0
 config['frac_sx2'] = 0.65
-config['frac_sx3'] = 1.0
+config['frac_sx3'] = 0.2
 cases = ['r', 'rx', 's', 'sx2', 'sx3']
 
 # All cases
