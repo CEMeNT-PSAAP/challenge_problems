@@ -1,4 +1,4 @@
-import mcdc, h5py
+import mcdc, h5py, math
 import numpy as np
 
 # ======================================================================================
@@ -911,8 +911,47 @@ source = mcdc.source(
 # Set tally, setting, and run mcdc
 # =============================================================================
 
+# Tally
+xmin = -133.35
+xmax = 133.35
+xmin_core = -96.76637999999998
+xmax_core = 96.76637999999998
+Nx = 9 * 17
+#
+x_grid = np.linspace(xmin_core, xmax_core, Nx + 1)
+pitch = x_grid[1] - x_grid[0]
+x_grid_right = np.append(np.arange(xmax_core, xmax, pitch), xmax)[1:]
+x_grid_left = np.flip(np.append(np.arange(xmin_core, xmin, -pitch), xmin))[:-1]
+x_grid = np.concatenate((x_grid_left, x_grid, x_grid_right))
+#
+xf_grid = np.linspace(xmin_core, xmax_core, Nx + 1)
+#
+zmin = -36.6205
+zmax = 246.61149999999998
+zmin_core = config['bottom']
+zmax_core = config['top']
+Nz = math.ceil((zmax - zmin)/pitch)
+Nz_core = math.ceil((zmax_core - zmin_core)/pitch)
+#
+z_grid = np.linspace(zmin, zmax, Nz + 1)
+zf_grid = np.linspace(zmin_core, zmax_core, Nz_core + 1)
+
+mcdc.tally.mesh_tally(
+    scores=["fission"],
+    x=xf_grid,
+    y=xf_grid,
+    z=zf_grid,
+)
+mcdc.tally.mesh_tally(
+    scores=["flux"],
+    x=x_grid,
+    y=x_grid,
+    z=z_grid,
+    g=np.array([-0.5, 4.5, 6.5])
+)
+
 # Setting
-mcdc.setting(N_particle=1e5)
+mcdc.setting(N_particle=1e3)
 mcdc.eigenmode(N_inactive=50, N_active=150, gyration_radius="all")
 mcdc.population_control()
 

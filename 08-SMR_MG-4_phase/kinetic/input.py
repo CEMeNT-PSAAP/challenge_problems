@@ -1,4 +1,4 @@
-import mcdc, h5py
+import mcdc, h5py, math
 import numpy as np
 
 # ======================================================================================
@@ -170,16 +170,16 @@ config['bottom'] = 2.220446049250313e-16
 config['length'] = config['top'] - config['bottom']
 
 # Problem spec.
-config['frac_r'] = 1.0
-config['time_r'] = 0.0
-config['frac_rx'] = 1.0
-config['time_rx'] = 0.0
-config['frac_s'] = 1.0
-config['time_s'] = 0.0
-config['frac_sx2'] = 0.65
-config['time_sx2'] = 0.0
-config['frac_sx3'] = 1.0
-config['time_sx3'] = 0.0
+config['frac_r'] = np.array([1.0, 1.0, 0.35, 1.0])
+config['time_r'] = np.array([0.0, 10.0, 15.0, 15.65])
+config['frac_rx'] = np.array([1.0, 1.0, 0.35, 0.75])
+config['time_rx'] = np.array([0.0, 10.0, 15.0, 15.4])
+config['frac_s'] = np.array([1.0, 1.0, 0.0, 0.0, 1.0])
+config['time_s'] = np.array([0.0, 5.0, 10.0, 15.0, 16.0])
+config['frac_sx2'] = np.array([0.65, 0.65, 1.0])
+config['time_sx2'] = np.array([0.0, 15.0, 15.35])
+config['frac_sx3'] = np.array([1.0, 1.0, 0.2, 0.2, 1.0])
+config['time_sx3'] = np.array([0.0, 5.0, 9.0, 15.0, 15.8])
 cases = ['r', 'rx', 's', 'sx2', 'sx3']
 
 # All cases
@@ -189,8 +189,18 @@ for case in cases:
     z_bottom = z_top - config['length']
 
     # The CR tip surfaces
-    s_top = mcdc.surface("plane-z", z=z_top)
-    s_bottom = mcdc.surface("plane-z", z=z_bottom)
+    s_top = mcdc.surface("plane-z", z=z_top[0])
+    s_bottom = mcdc.surface("plane-z", z=z_bottom[0])
+
+    # Tip moving durations and velocities
+    t_move = config[f'time_{case}']
+    durations = t_move[1:] - t_move[:-1]
+    velocities = np.zeros((len(durations), 3))
+    velocities[:, 2] = (z_top[1:] - z_top[:-1]) / durations
+
+    # Move the surfaces
+    s_top.move(velocities, durations)
+    s_bottom.move(velocities, durations)
 
     # CR region
     cr_region = +s_bottom & -s_top
@@ -914,6 +924,49 @@ source = mcdc.source(
 # =============================================================================
 # Set tally, setting, and run mcdc
 # =============================================================================
+
+# Tally
+xmin = -133.35
+xmax = 133.35
+xmin_core = -96.76637999999998
+xmax_core = 96.76637999999998
+Nx = 9 * 17
+#
+x_grid = np.linspace(xmin_core, xmax_core, Nx + 1)
+pitch = x_grid[1] - x_grid[0]
+x_grid_right = np.append(np.arange(xmax_core, xmax, pitch), xmax)[1:]
+x_grid_left = np.flip(np.append(np.arange(xmin_core, xmin, -pitch), xmin))[:-1]
+x_grid = np.concatenate((x_grid_left, x_grid, x_grid_right))
+#
+xf_grid = np.linspace(xmin_core, xmax_core, Nx + 1)
+#
+zmin = -36.6205
+zmax = 246.61149999999998
+zmin_core = config['bottom']
+zmax_core = config['top']
+Nz = math.ceil((zmax - zmin)/pitch)
+Nz_core = math.ceil((zmax_core - zmin_core)/pitch)
+#
+z_grid = np.linspace(zmin, zmax, Nz + 1)
+zf_grid = np.linspace(zmin_core, zmax_core, Nz_core + 1)
+#
+t_grid = np.linspace(0.0, 20.0, 201)
+#
+mcdc.tally.mesh_tally(
+    scores=["fission"],
+    x=xf_grid,
+    y=xf_grid,
+    z=zf_grid,
+    t=t_grid,
+)
+mcdc.tally.mesh_tally(
+    scores=["flux"],
+    x=x_grid,
+    y=x_grid,
+    z=z_grid,
+    g=np.array([-0.5, 4.5, 6.5]),
+    t=t_grid,
+)
 
 # Setting
 mcdc.setting(N_particle=1e5)
