@@ -1,40 +1,89 @@
 import numpy as np
-import h5py, mcdc, math
-
-# Get IC generator parameters
-with h5py.File("../part2/output.h5", "r") as f:
-    keff = f["k_mean"][()]
+import mcdc, math
 
 # =============================================================================
 # Materials
 # =============================================================================
 
-# Load material data
-lib = h5py.File("../../data/MGXS-C5G7.h5", "r")
-
-# Setter
-def set_mat(mat):
-    return mcdc.material(
-        capture=mat["capture"][:],
-        scatter=mat["scatter"][:],
-        fission=mat["fission"][:],
-        nu_p=mat["nu_p"][:] / keff,
-        nu_d=mat["nu_d"][:] / keff,
-        chi_p=mat["chi_p"][:],
-        chi_d=mat["chi_d"][:],
-        speed=mat["speed"],
-        decay=mat["decay"],
-    )
-
-# Materials
-mat_uo2 = set_mat(lib["uo2"])  # Fuel: UO2
-mat_mox43 = set_mat(lib["mox43"])  # Fuel: MOX 4.3%
-mat_mox7 = set_mat(lib["mox7"])  # Fuel: MOX 7.0%
-mat_mox87 = set_mat(lib["mox87"])  # Fuel: MOX 8.7%
-mat_gt = set_mat(lib["gt"])  # Guide tube
-mat_fc = set_mat(lib["fc"])  # Fission chamber
-mat_cr = set_mat(lib["cr"])  # Control rod
-mat_mod = set_mat(lib["mod"])  # Moderator
+mat_uo2 = mcdc.material(
+    [
+        ["O16", 0.04585265389377734],
+        ["O17", 1.7419604031574338e-05],
+        ["O18", 9.19424166352541e-05],
+        ["U235", 0.0007217486041189947],
+        ["U238", 0.02224950230720295],
+    ]
+)
+mat_mox43 = mcdc.material(
+    [
+        ["O16", 0.04589711643122753],
+        ["O17", 1.743649552488715e-05],
+        ["O18", 9.203157163056531e-05],
+        ["U235", 0.0003750264168772414],
+        ["U238", 0.02262319599228636],
+    ]
+)
+mat_mox7 = mcdc.material(
+    [
+        ["O16", 0.04583036614158277],
+        ["O17", 1.741113682662514e-05],
+        ["O18", 9.189772587857765e-05],
+        ["U235", 0.0005581382302893396],
+        ["U238", 0.022404154012604437],
+    ]
+)
+mat_mox87 = mcdc.material(
+    [
+        ["O16", 0.04585265389377734],
+        ["O17", 1.7419604031574338e-05],
+        ["O18", 9.19424166352541e-05],
+        ["U235", 0.0007217486041189947],
+        ["U238", 0.02224950230720295],
+    ]
+)
+mat_gt = mcdc.material(
+    [
+        ["H1", 0.050347844752850625],
+        ["H2", 7.842394716362082e-06],
+        ["O16", 0.025117935412784034],
+        ["O17", 9.542402714463945e-06],
+        ["O18", 5.03657582849965e-05],
+    ]
+)
+mat_fc = mcdc.material(
+    [
+        ["H1", 0.050347844752850625],
+        ["H2", 7.842394716362082e-06],
+        ["O16", 0.025117935412784034],
+        ["O17", 9.542402714463945e-06],
+        ["O18", 5.03657582849965e-05],
+    ]
+)
+mat_cr = mcdc.material(
+    [
+        ['Ag107', 0.023523285675833942],
+        ['Ag109', 0.02185429814297804],
+        ['In113', 0.0003421922042655644],
+        ['In115', 0.007651085167039375],
+        ['Cd106', 3.38816276451386e-05],
+        ['Cd108', 2.4166172970990425e-05],
+        ['Cd110', 0.0003393605596264083],
+        ['Cd111', 0.0003482051612205208],
+        ['Cd112', 0.0006561061533306398],
+        ['Cd113', 0.00033274751904988726],
+        ['Cd114', 0.0007825159207295705],
+        ['Cd116', 0.00020443276053837845],
+    ]
+)
+mat_mod = mcdc.material(
+    [
+        ["H1", 0.050347844752850625],
+        ["H2", 7.842394716362082e-06],
+        ["O16", 0.025117935412784034],
+        ["O17", 9.542402714463945e-06],
+        ["O18", 5.03657582849965e-05],
+    ]
+)
 
 # =============================================================================
 # Pin cells
@@ -46,36 +95,38 @@ radius = 0.54
 core_height = 128.52
 reflector_thickness = 21.42
 
+# Control rod banks fractions
+#   All out: 0.0
+#   All in : 1.0
+cr1 = 1.0
+cr2 = 0.3
+cr3 = 1.0
+cr4 = 1.0
+
+# Tips of the control rod banks
+cr1_bottom = core_height * (0.5 - cr1)
+cr2_bottom = core_height * (0.5 - cr2)
+cr3_bottom = core_height * (0.5 - cr3)
+cr4_bottom = core_height * (0.5 - cr4)
+cr1_top = cr1_bottom + core_height
+cr2_top = cr2_bottom + core_height
+cr3_top = cr3_bottom + core_height
+cr4_top = cr4_bottom + core_height
+
 # Surfaces
 cy = mcdc.surface("cylinder-z", center=[0.0, 0.0], radius=radius)
 # Control rod top and bottom tips
-z1_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z1_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
-z2_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z2_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
-z3_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z3_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
-z4_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z4_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
+z1_top = mcdc.surface("plane-z", z=cr1_top)
+z1_bottom = mcdc.surface("plane-z", z=cr1_bottom)
+z2_top = mcdc.surface("plane-z", z=cr2_top)
+z2_bottom = mcdc.surface("plane-z", z=cr2_bottom)
+z3_top = mcdc.surface("plane-z", z=cr3_top)
+z3_bottom = mcdc.surface("plane-z", z=cr3_bottom)
+z4_top = mcdc.surface("plane-z", z=cr4_top)
+z4_bottom = mcdc.surface("plane-z", z=cr4_bottom)
 # Fuel top
 #   (Bottom is bounded by the universe cell)
 zf = mcdc.surface("plane-z", z=0.5 * core_height)
-
-# Set moving control rods' durations
-cr3_durations = np.array([4.0, 2.0, 2.0])
-cr4_durations = np.array([2.0, 2.0, 2.0])
-
-# Set moving control rods' velocities
-cr3_velocities = np.zeros(cr3_durations.shape + (3,))
-cr4_velocities = np.zeros(cr4_durations.shape + (3,))
-cr3_velocities[:, 2] = np.array([0.0, -1.0/6.0, 1.0/6.0]) * core_height
-cr4_velocities[:, 2] = np.array([-1.0/6.0, 0.0, 1.0/6.0]) * core_height
-
-# Move the control tips
-z3_top.move(cr3_velocities, cr3_durations)
-z3_bottom.move(cr3_velocities, cr3_durations)
-z4_top.move(cr4_velocities, cr4_durations)
-z4_bottom.move(cr4_velocities, cr4_durations)
 
 # Fission chamber pin
 fc = mcdc.cell(-cy, mat_fc)
@@ -289,30 +340,39 @@ mcdc.universe(
 )
 
 # =============================================================================
+# Set source
+# =============================================================================
+# In the center of Assembly one, at highest energy, for the first 15 seconds
+
+mcdc.source(
+    point=[pitch * 17 / 2, -pitch * 17 / 2, 0.0],
+    energy=np.array([[1e6 - 1, 1e6 + 1], [1.0, 1.0]]),
+    isotropic=True,
+)
+
+# =============================================================================
 # Set tally, setting, and run mcdc
 # =============================================================================
 
 # Tally
-t_grid = np.linspace(0.0, 8.0, 81)
-mcdc.tally.mesh_tally(scores=["fission"], t=t_grid)
 mcdc.tally.mesh_tally(
     scores=["fission"],
     x=np.linspace(0.0, pitch * 17 * 2, 17 * 2 + 1),
     y=np.linspace(-pitch * 17 * 2, 0.0, 17 * 2 + 1),
     z=np.linspace(-(core_height / 2), (core_height / 2), int(math.ceil(core_height / pitch)) + 1),
-    t=t_grid
 )
 mcdc.tally.mesh_tally(
     scores=["flux"],
     x=np.linspace(0.0, pitch * 17 * 3, 17 * 3 + 1),
     y=np.linspace(-pitch * 17 * 3, 0.0, 17 * 3 + 1),
     z=np.linspace(-(core_height / 2 + reflector_thickness), (core_height / 2 + reflector_thickness), int(math.ceil((core_height + 2.0 * reflector_thickness) / pitch)) + 1),
-    g=np.array([-0.5, 4.5, 6.5]),
-    t=t_grid
+    E=np.array([0.0, 0.625, 2e7]),
 )
 
 # Setting
-mcdc.setting(IC_file="../part2/output.h5", active_bank_buff=10000)
+mcdc.setting(N_particle=1e5)
+mcdc.eigenmode(N_inactive=30, N_active=50, gyration_radius="all")
+mcdc.population_control()
 
 # Run
 mcdc.run()

@@ -1,10 +1,6 @@
 import numpy as np
 import h5py, mcdc, math
 
-# Get IC generator parameters
-with h5py.File("../part2/output.h5", "r") as f:
-    keff = f["k_mean"][()]
-
 # =============================================================================
 # Materials
 # =============================================================================
@@ -18,8 +14,8 @@ def set_mat(mat):
         capture=mat["capture"][:],
         scatter=mat["scatter"][:],
         fission=mat["fission"][:],
-        nu_p=mat["nu_p"][:] / keff,
-        nu_d=mat["nu_d"][:] / keff,
+        nu_p=mat["nu_p"][:],
+        nu_d=mat["nu_d"][:],
         chi_p=mat["chi_p"][:],
         chi_d=mat["chi_d"][:],
         speed=mat["speed"],
@@ -46,36 +42,38 @@ radius = 0.54
 core_height = 128.52
 reflector_thickness = 21.42
 
+# Control rod banks fractions
+#   All out: 0.0
+#   All in : 1.0
+cr1 = 1.0
+cr2 = 1.0
+cr3 = 0.75
+cr4 = 1.0
+
+# Tips of the control rod banks
+cr1_bottom = core_height * (0.5 - cr1)
+cr2_bottom = core_height * (0.5 - cr2)
+cr3_bottom = core_height * (0.5 - cr3)
+cr4_bottom = core_height * (0.5 - cr4)
+cr1_top = cr1_bottom + core_height
+cr2_top = cr2_bottom + core_height
+cr3_top = cr3_bottom + core_height
+cr4_top = cr4_bottom + core_height
+
 # Surfaces
 cy = mcdc.surface("cylinder-z", center=[0.0, 0.0], radius=radius)
 # Control rod top and bottom tips
-z1_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z1_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
-z2_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z2_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
-z3_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z3_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
-z4_top = mcdc.surface("plane-z", z=1.5 * core_height)
-z4_bottom = mcdc.surface("plane-z", z=0.5 * core_height)
+z1_top = mcdc.surface("plane-z", z=cr1_top)
+z1_bottom = mcdc.surface("plane-z", z=cr1_bottom)
+z2_top = mcdc.surface("plane-z", z=cr2_top)
+z2_bottom = mcdc.surface("plane-z", z=cr2_bottom)
+z3_top = mcdc.surface("plane-z", z=cr3_top)
+z3_bottom = mcdc.surface("plane-z", z=cr3_bottom)
+z4_top = mcdc.surface("plane-z", z=cr4_top)
+z4_bottom = mcdc.surface("plane-z", z=cr4_bottom)
 # Fuel top
 #   (Bottom is bounded by the universe cell)
 zf = mcdc.surface("plane-z", z=0.5 * core_height)
-
-# Set moving control rods' durations
-cr3_durations = np.array([4.0, 2.0, 2.0])
-cr4_durations = np.array([2.0, 2.0, 2.0])
-
-# Set moving control rods' velocities
-cr3_velocities = np.zeros(cr3_durations.shape + (3,))
-cr4_velocities = np.zeros(cr4_durations.shape + (3,))
-cr3_velocities[:, 2] = np.array([0.0, -1.0/6.0, 1.0/6.0]) * core_height
-cr4_velocities[:, 2] = np.array([-1.0/6.0, 0.0, 1.0/6.0]) * core_height
-
-# Move the control tips
-z3_top.move(cr3_velocities, cr3_durations)
-z3_bottom.move(cr3_velocities, cr3_durations)
-z4_top.move(cr4_velocities, cr4_durations)
-z4_bottom.move(cr4_velocities, cr4_durations)
 
 # Fission chamber pin
 fc = mcdc.cell(-cy, mat_fc)
@@ -289,30 +287,40 @@ mcdc.universe(
 )
 
 # =============================================================================
+# Set source
+# =============================================================================
+# In the center of Assembly one, at highest energy, for the first 15 seconds
+
+energy = np.zeros(7)
+energy[0] = 1.0
+
+source = mcdc.source(
+    point=[pitch * 17 / 2, -pitch * 17 / 2, 0.0], energy=energy
+)
+
+# =============================================================================
 # Set tally, setting, and run mcdc
 # =============================================================================
 
 # Tally
-t_grid = np.linspace(0.0, 8.0, 81)
-mcdc.tally.mesh_tally(scores=["fission"], t=t_grid)
 mcdc.tally.mesh_tally(
     scores=["fission"],
     x=np.linspace(0.0, pitch * 17 * 2, 17 * 2 + 1),
     y=np.linspace(-pitch * 17 * 2, 0.0, 17 * 2 + 1),
     z=np.linspace(-(core_height / 2), (core_height / 2), int(math.ceil(core_height / pitch)) + 1),
-    t=t_grid
 )
 mcdc.tally.mesh_tally(
     scores=["flux"],
     x=np.linspace(0.0, pitch * 17 * 3, 17 * 3 + 1),
     y=np.linspace(-pitch * 17 * 3, 0.0, 17 * 3 + 1),
     z=np.linspace(-(core_height / 2 + reflector_thickness), (core_height / 2 + reflector_thickness), int(math.ceil((core_height + 2.0 * reflector_thickness) / pitch)) + 1),
-    g=np.array([-0.5, 4.5, 6.5]),
-    t=t_grid
+    g=np.array([-0.5, 4.5, 6.5])
 )
 
 # Setting
-mcdc.setting(IC_file="../part2/output.h5", active_bank_buff=10000)
+mcdc.setting(N_particle=1e3)
+mcdc.eigenmode(N_inactive=50, N_active=150, gyration_radius="all")
+mcdc.population_control()
 
 # Run
 mcdc.run()
