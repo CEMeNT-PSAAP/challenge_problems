@@ -57,11 +57,11 @@ The first two parts are based on the methods described in [^5]
 A nuclear reactor transient exercise exhibiting several key neutronics transient features.
 The transient is driven by time-dependent control rod positions and neutron source strengths.
 - Phase 1: Start-up convergence of a source-driven subcritical configuration,
-- Phase 2: Control rods withdrawal demonstrating the S-wave power maneuver,
+- Phase 2: Control rods withdrawal demonstrating the S-shape maneuver of power level,
 - Phase 3: Power excursion from prompt supercriticality,
 - Phase 4: Reactor shutdown emphasizing the delayed neutron effects.
 Stuck control rods are considered to promote spatial asymmetry in the flux distribution.
-Quantities of interest include total neutron density in time and axially segmented pin power and fluxes.
+Quantities of interest include evolutions of total power and axially segmented pin power, as well as thermal and fast fluxes.
 
 ## Problem 6: C5G7 Four-Phase Transient
 
@@ -90,5 +90,7 @@ A _depleted_ NuScale-inspired small modular reactor model [^6] going through the
 A fast neutron burst induced by strong reactivity pulses from a drop-through of a highly enriched uranium slug.
 
 The problem attempts to simulate the Dragon machine experiment by Otto Frisch [^7].
+At the heart of the problem is the reactivity excursion, giving nine orders of magnitude power increase in tens of milliseconds.
+A second reactivity pulse is introduced to emphasize the effect of the accumulating delayed neutron precursors.
 
 [^7]: Robert Kimpland, Travis Grove, Peter Jaegers, Richard Malenfant, and William Myers, "Critical Assemblies: Dragon Burst Assembly and Solution Assemblies," Nuclear Technology, 207, S81-S99 (2021). [[link]](https://www.tandfonline.com/doi/pdf/10.1080/00295450.2021.1927626)
