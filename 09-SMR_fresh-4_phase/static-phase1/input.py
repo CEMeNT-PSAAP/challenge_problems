@@ -1,4 +1,4 @@
-import mcdc
+import mcdc, math
 import numpy as np
 
 # ======================================================================================
@@ -393,7 +393,7 @@ config['time'] = 1.0
 config['frac_r'] = 1.0
 config['frac_rx'] = 1.0
 config['frac_s'] = 1.0
-config['frac_sx2'] = 0.25
+config['frac_sx2'] = 0.0
 config['frac_sx3'] = 1.0
 cases = ['r', 'rx', 's', 'sx2', 'sx3']
 
@@ -1129,14 +1129,54 @@ mcdc.source(
 # Set tally and parameter, and then run mcdc
 # =============================================================================
 
+# Tally
+xmin = -133.35
+xmax = 133.35
+xmin_core = -96.76637999999998
+xmax_core = 96.76637999999998
+Nx = 9 * 17
+#
+x_grid = np.linspace(xmin_core, xmax_core, Nx + 1)
+pitch = x_grid[1] - x_grid[0]
+x_grid_right = np.append(np.arange(xmax_core, xmax, pitch), xmax)[1:]
+x_grid_left = np.flip(np.append(np.arange(xmin_core, xmin, -pitch), xmin))[:-1]
+x_grid = np.concatenate((x_grid_left, x_grid, x_grid_right))
+#
+xf_grid = np.linspace(xmin_core, xmax_core, Nx + 1)
+#
+zmin = -36.6205
+zmax = 246.61149999999998
+zmin_core = config['bottom']
+zmax_core = config['top']
+Nz = math.ceil((zmax - zmin)/pitch)
+Nz_core = math.ceil((zmax_core - zmin_core)/pitch)
+#
+z_grid = np.linspace(zmin, zmax, Nz + 1)
+zf_grid = np.linspace(zmin_core, zmax_core, Nz_core + 1)
+
+mcdc.tally.mesh_tally(
+    scores=["fission"],
+    x=xf_grid,
+    y=xf_grid,
+    z=zf_grid,
+)
+mcdc.tally.mesh_tally(
+    scores=["flux"],
+    x=x_grid,
+    y=x_grid,
+    z=z_grid,
+    E=np.array([0.0, 0.625, 2e7]),
+)
+
 # Setting
-mcdc.setting(N_particle=1e5)
+mcdc.setting(N_particle=1e4, census_bank_buff=2)
 mcdc.eigenmode(N_inactive=50, N_active=150, gyration_radius="all")
 mcdc.population_control()
 
 # Run
 mcdc.run()
 
+'''
 colors = {
     m_helium: "azure",
     m_inconel: "gray",
@@ -1152,4 +1192,5 @@ colors = {
     m_cr: 'green',
 }
 #mcdc.visualize('xy', x=[-150, 150], y=[-150, 150], z=100.0, pixels=(1000, 1000), colors=colors)
-mcdc.visualize('xz', x=[-150, 150], z=[-37, 247], y=0.0, pixels=(1000, 1000), colors=colors)
+#mcdc.visualize('xz', x=[-150, 150], z=[-37, 247], y=0.0, pixels=(1000, 1000), colors=colors)
+'''
