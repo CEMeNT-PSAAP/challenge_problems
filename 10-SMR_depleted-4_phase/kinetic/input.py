@@ -518,12 +518,16 @@ config['bottom'] = 2.220446049250313e-16
 config['length'] = config['top'] - config['bottom']
 
 # Problem spec.
-config['time'] = 1.0
-config['frac_r'] = 1.0
-config['frac_rx'] = 1.0
-config['frac_s'] = 1.0
-config['frac_sx2'] = 0.0
-config['frac_sx3'] = 1.0
+config['frac_r'] = np.array([1.0, 1.0, 0.35, 1.0])
+config['time_r'] = np.array([0.0, 10.0, 15.0, 15.65])
+config['frac_rx'] = np.array([1.0, 1.0, 0.35, 0.75])
+config['time_rx'] = np.array([0.0, 10.0, 15.0, 15.4])
+config['frac_s'] = np.array([1.0, 1.0, 0.0, 0.0, 1.0])
+config['time_s'] = np.array([0.0, 5.0, 10.0, 15.0, 16.0])
+config['frac_sx2'] = np.array([0.65, 0.65, 1.0])
+config['time_sx2'] = np.array([0.0, 15.0, 15.35])
+config['frac_sx3'] = np.array([1.0, 1.0, 0.2, 0.2, 1.0])
+config['time_sx3'] = np.array([0.0, 5.0, 9.0, 15.0, 15.8])
 cases = ['r', 'rx', 's', 'sx2', 'sx3']
 
 # All cases
@@ -533,8 +537,18 @@ for case in cases:
     z_bottom = z_top - config['length']
 
     # The CR tip surfaces
-    s_top = mcdc.surface("plane-z", z=z_top)
-    s_bottom = mcdc.surface("plane-z", z=z_bottom)
+    s_top = mcdc.surface("plane-z", z=z_top[0])
+    s_bottom = mcdc.surface("plane-z", z=z_bottom[0])
+
+    # Tip moving durations and velocities
+    t_move = config[f'time_{case}']
+    durations = t_move[1:] - t_move[:-1]
+    velocities = np.zeros((len(durations), 3))
+    velocities[:, 2] = (z_top[1:] - z_top[:-1]) / durations
+
+    # Move the surfaces
+    s_top.move(velocities, durations)
+    s_bottom.move(velocities, durations)
 
     # CR region
     cr_region = +s_bottom & -s_top
@@ -1252,6 +1266,7 @@ mcdc.source(
     point=[0.0, 0.0, 100.0],
     energy=np.array([[1e6 - 1, 1e6 + 1], [1.0, 1.0]]),
     isotropic=True,
+    time=[0.0, 15.0]
 )
 
 # =============================================================================
@@ -1282,12 +1297,15 @@ Nz_core = math.ceil((zmax_core - zmin_core)/pitch)
 #
 z_grid = np.linspace(zmin, zmax, Nz + 1)
 zf_grid = np.linspace(zmin_core, zmax_core, Nz_core + 1)
+#
+t_grid = np.linspace(0.0, 20.0, 201)
 
 mcdc.tally.mesh_tally(
     scores=["fission"],
     x=xf_grid,
     y=xf_grid,
     z=zf_grid,
+    t=t_grid,
 )
 mcdc.tally.mesh_tally(
     scores=["flux"],
@@ -1295,12 +1313,11 @@ mcdc.tally.mesh_tally(
     y=x_grid,
     z=z_grid,
     E=np.array([0.0, 0.625, 2e7]),
+    t=t_grid,
 )
 
 # Setting
 mcdc.setting(N_particle=1e4, census_bank_buff=2)
-mcdc.eigenmode(N_inactive=50, N_active=150, gyration_radius="all")
-mcdc.population_control()
 
 # Run
 mcdc.run()
