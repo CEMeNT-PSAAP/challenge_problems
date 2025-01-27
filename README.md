@@ -94,3 +94,14 @@ At the heart of the problem is the reactivity excursion, giving nine orders of m
 A second reactivity pulse is introduced to emphasize the effect of the accumulating delayed neutron precursors.
 
 [^7]: Robert Kimpland, Travis Grove, Peter Jaegers, Richard Malenfant, and William Myers, "Critical Assemblies: Dragon Burst Assembly and Solution Assemblies," Nuclear Technology, 207, S81-S99 (2021). [[link]](https://www.tandfonline.com/doi/pdf/10.1080/00295450.2021.1927626)
+
+## Problem 12
+
+A time dependent verification problem based on experiments performed by LLNL. A D-T reaction releases high energy (~14 MeV) neutrons at the center of a sphere of material, and the time-of-flight of those neutrons is measured at a distant detector. [[link]](https://mcnp.lanl.gov/pdf_files/TechReport_1972_LLNL_UCRL-51144Rev.1_WongAndersonEtAl.pdf)
+
+Current implementation only includes one iron sphere with the limitations:
+    - missing the target D-T assembly (the D-T reaction does not need to be modeled)
+    - missing the collimator assemblies
+    - monoenergetic isotropic source (full description of the angular-energy dependent source is not yet possible in MC/DC)
+    - some neutron scattering physics are not complete in MC/DC
+    - the detector is a full sphere, but can be set more accurately if needed when the geometry gets less symmetric
