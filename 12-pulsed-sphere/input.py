@@ -67,6 +67,7 @@ PStally = mcdc.tally.mesh_tally(
 full_sphere_tally = mcdc.tally.cell_tally(
     c_det1,
     t=np.linspace(0.0, 500.0e-9, 250),
+    #E=np.linspace(0.0,20e6,20),
     scores=["flux"]
 )
 
@@ -74,8 +75,8 @@ full_sphere_tally = mcdc.tally.cell_tally(
 # Settings
 # =============================================================================
 
-mcdc.setting(N_particle=1e4)
-mcdc.time_census(np.linspace(0.0, 500.0e-9, 250)[1:-1])
+mcdc.setting(N_particle=1e3)
+#mcdc.time_census(np.linspace(0.0, 500.0e-9, 250)[1:-1])
 mcdc.implicit_capture()
 
 mcdc.run()
