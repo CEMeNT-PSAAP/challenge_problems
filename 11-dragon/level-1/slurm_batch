@@ -1,0 +1,32 @@
+#!/bin/bash
+##### These lines are for Slurm
+#SBATCH -N 1
+#SBATCH -J dragon
+#SBATCH -t 1:00:00
+#SBATCH -p pbatch
+#SBATCH -A orsu
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=morgajoa@oregonstate.edu
+
+
+##### These are shell commands
+date
+echo ""
+lscpu
+echo "" 
+module list
+source ~/dane/bin/activate
+ 
+which python
+
+echo ""
+echo ""
+echo ""
+
+srun -n 112 python input-dragon.py --no-progress_bar --mode=numba
+
+echo ""
+echo ""
+echo "*****JOB COMPLETE******"
+echo ""
+echo ""
